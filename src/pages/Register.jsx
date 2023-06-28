@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Add from '../img/addAvatar.png'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
-import { auth, storage } from '../firebase'
+import { auth, storage, db } from '../firebase'
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { doc, setDoc } from "firebase/firestore";
 
@@ -31,25 +31,20 @@ const Register = () => {
           setErr(true);
         },
         () => {
-          // Handle successful uploads on complete
-          // For instance, get the download URL: https://firebasestorage.googleapis.com/...
           getDownloadURL(uploadTask.snapshot.ref).then(async(downloadURL) => {
             await updateProfile(res.user, {
               displayName,
               photoURL: downloadURL,
-            })
-
+            });
             await setDoc(doc(db, 'users', res.user.uid), {
               uid: res.user.uid,
               displayName,
               email,
               photoURL: downloadURL,
-            })
+            });
           });
         }
       );
-
-
     } catch(err) {
       setErr(true)
     }
@@ -65,7 +60,7 @@ const Register = () => {
           <input type='text' placeholder='display name' />
           <input type='email' placeholder='email' />
           <input type='password' placeholder='password' />
-          <input style={{display:"none"}} type='file' />
+          <input style={{display:"none"}} type='file' id='file' />
           <label htmlFor='file'>
             <img src={Add} alt='' />
             <span>Add an avatar</span>
