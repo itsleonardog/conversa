@@ -1,5 +1,7 @@
-import React from 'react'
-import Add from '../img/addAvatar.png'
+import React, { useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../firebase';
 
 const Login = () => {
   const [err, setErr] = useState(false);
@@ -11,7 +13,8 @@ const Login = () => {
     const password = e.target[1].value
 
     try {
-
+      await signInWithEmailAndPassword(auth, email, password);
+      navigate('/');
     } catch(err) {
       console.error(err);
       setErr(true)
@@ -23,11 +26,12 @@ const Login = () => {
       <div className='formWrapper'>
         <span className='logo'>Conversa</span>
         <span className='title'>Login</span>
-        <form>
+        <form onSubmit={handleSubmit}>
           <input type='email' placeholder='email' />
           <input type='password' placeholder='password' />
           <button>Sign In</button>
-          <p>Don't have an account? Register</p>
+          {err && <span>Something went wrong!</span>}
+          <p>Don't have an account? <Link to='/register'>Register</Link></p>
         </form>
       </div>
     </div>
