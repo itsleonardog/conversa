@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Add from '../img/addAvatar.png'
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { auth, storage, db } from '../firebase'
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { doc, setDoc } from "firebase/firestore";
 
 
@@ -20,32 +20,23 @@ const Register = () => {
 
       const storageRef = ref(storage, displayName);
 
-      const uploadTask = uploadBytesResumable(storageRef, file);
+      const snapshot = await uploadBytes(storageRef, file);
 
-      // Register three observers:
-      // 1. 'state_changed' observer, called any time the state changes
-      // 2. Error observer, called on failure
-      // 3. Completion observer, called on successful completion
-      uploadTask.on(
-        (error) => {
-          setErr(true);
-        },
-        () => {
-          getDownloadURL(uploadTask.snapshot.ref).then(async(downloadURL) => {
-            await updateProfile(res.user, {
-              displayName,
-              photoURL: downloadURL,
-            });
-            await setDoc(doc(db, 'users', res.user.uid), {
-              uid: res.user.uid,
-              displayName,
-              email,
-              photoURL: downloadURL,
-            });
-          });
-        }
-      );
+      // Get the download URL for the uploaded file
+      const downloadURL = await getDownloadURL(snapshot.ref);
+
+      await updateProfile(res.user, {
+        displayName,
+        photoURL: downloadURL,
+      });
+      await setDoc(doc(db, 'users', res.user.uid), {
+        uid: res.user.uid,
+        displayName,
+        email,
+        photoURL: downloadURL,
+      });
     } catch(err) {
+      console.error(err);
       setErr(true)
     }
   }
@@ -66,7 +57,7 @@ const Register = () => {
             <span>Add an avatar</span>
           </label>
           <button>Sign Up</button>
-          {err && <span>Something went wrong</span>}
+          {err && <span>Something went wrong. Please try again later.</span>}
         </form>
           <p>Don't have an account? Login</p>
       </div>
