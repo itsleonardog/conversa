@@ -1,7 +1,7 @@
 import { doc, onSnapshot } from 'firebase/firestore'
 import React, { useContext, useEffect, useState } from 'react'
 import { db } from '../firebase'
-import { currentUser } from 'firebase/auth'
+// import { currentUser } from 'firebase/auth'
 import { AuthContext } from '../context/AuthContext'
 
 const Chats = () => {
@@ -9,13 +9,16 @@ const Chats = () => {
   const { currentUser } = useContext(AuthContext);
 
   useEffect(() => {
-    const unsub = onSnapshot(doc(db, 'userChats', currentUser.uid), (doc) => {
-      setChats(doc.data())
-    });
+    const getChats = () => {
+      const unsub = onSnapshot(doc(db, 'userChats', currentUser.uid), (doc) => {
+        setChats(doc.data())
+      });
 
-    return () => {
-      unsub();
-    }
+      return () => {
+        unsub();
+      };
+    };
+    currentUser.uid && getChats();
   }, [currentUser.uid]);
 
   console.log(chats)
