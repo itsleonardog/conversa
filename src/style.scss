@@ -16,6 +16,8 @@
   }
 }
 
+
+
 .formContainer {
   background-color: #F4F4F4;
   height: 100vh;
@@ -166,7 +168,7 @@
     }
 
     .search {
-      border-bottom: 1px solid black;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.281);
 
       .searchForm {
         input {
@@ -214,6 +216,16 @@
         }
       }
     }
+  }
+
+  .sidebar::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: 1px; /* Set the width of the line */
+    background-color: rgba(0, 0, 0, 0.281); /* Set the color of the line */
   }
 
   .chat {
